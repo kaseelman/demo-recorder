@@ -6,11 +6,12 @@ Record your screen, and demo-recorder turns it into a smooth demo video. The cam
 what you click, the cursor glides, and your recording sits in a glass frame on a soft wallpaper.
 It's the "auto zoom" look of paid screen recorders, running entirely on your Mac.
 
-![A finished demo frame: the recording in a glass frame on a gradient wallpaper](docs/render.jpg)
+![The editor: live preview of the framed recording, settings panel and timeline](docs/editor.jpg)
 
 <table><tr>
-<td><img src="docs/render-zoomed.jpg" alt="The camera zoomed in on a click"></td>
-<td><img src="docs/editor.png" alt="The editor: live preview, settings panel and timeline"></td>
+<td width="33%"><img src="docs/render-zoomed.jpg" alt="The camera zoomed in on a click"><br><sub>The camera eases in on what you click</sub></td>
+<td width="33%"><img src="docs/render.jpg" alt="A finished frame on a soft wallpaper"><br><sub>Glass frame on a generated wallpaper</sub></td>
+<td width="33%"><img src="docs/record.jpg" alt="The Record dialog: choose your entire screen or a window"><br><sub>Record a screen or a single window</sub></td>
 </tr></table>
 
 ## Features
