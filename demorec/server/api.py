@@ -10,7 +10,7 @@ from .. import compose, cursor
 from ..camera import camera_path, segments_from_json
 from ..config import load_config
 from ..layout import clip_layout, project_canvas
-from ..paths import BACKGROUNDS
+from ..paths import BACKGROUNDS, UPLOADS
 from ..project import (create_project, cursor_settings, list_projects, load_project, new_clip,
                        project_dir, save_project)
 from ..recording import list_recordings
@@ -68,10 +68,9 @@ def editor_defaults():
 
 
 def list_backgrounds():
-    def files(sub):
-        d = BACKGROUNDS / sub
-        return sorted(f"{sub}/{p.name}" for p in d.iterdir() if p.suffix.lower() in IMAGE_EXT) if d.exists() else []
-    return {"presets": files("presets"), "uploads": files("uploads")}
+    def files(d, prefix):
+        return sorted(f"{prefix}/{p.name}" for p in d.iterdir() if p.suffix.lower() in IMAGE_EXT) if d.exists() else []
+    return {"presets": files(BACKGROUNDS / "presets", "presets"), "uploads": files(UPLOADS, "uploads")}
 
 
 # --------------------------------------------------------------------------- endpoints
@@ -124,9 +123,8 @@ def upload_background(filename, data):
     name = re.sub(r"[^A-Za-z0-9._-]+", "-", filename)
     if Path(name).suffix.lower() not in IMAGE_EXT:
         raise ValueError("Use a JPG, PNG or WebP image")
-    d = BACKGROUNDS / "uploads"
-    d.mkdir(parents=True, exist_ok=True)
-    dest = d / f"{secrets.token_hex(3)}-{name}"
+    UPLOADS.mkdir(parents=True, exist_ok=True)
+    dest = UPLOADS / f"{secrets.token_hex(3)}-{name}"
     dest.write_bytes(data)
     return {"path": f"uploads/{dest.name}"}
 

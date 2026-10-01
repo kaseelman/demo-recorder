@@ -1,25 +1,33 @@
-// Entry point: loads the project, wires modules together and binds global controls.
+// Entry point: loads the project, connects the components and binds global controls.
 //
-// Module map
-//   state.js          shared editor state           model.js        pure timeline/layout maths
-//   api.js            server client                 persistence.js  autosave
-//   stage.js          live preview of the canvas    aim.js          zoom-aiming frame
-//   crop.js           crop tool                     timeline.js     timeline view + edits
-//   selection-bar.js  context bar for selections    inspector.js    right-hand settings panel
-//   playback.js       play/pause/seek clock         render-jobs.js  render buttons + progress
-import { api } from './api.js';
-import { app } from './app.js';
-import { computeTimeline } from './model.js';
-import { changed, flush } from './persistence.js';
-import { pause, seek, togglePlay } from './playback.js';
-import { bindInspector, renderPanel } from './inspector.js';
-import { bindRenderButtons, poll } from './render-jobs.js';
-import { drawSelectionBar } from './selection-bar.js';
-import { layoutStage, rebuildCards, update } from './stage.js';
-import { S, tagSegment } from './state.js';
-import { addZoom, bindTimeline, deleteSelected, drawTimeline, layoutTimeline } from './timeline.js';
-import { $, $$ } from './util.js';
-import { endCrop } from './crop.js';
+//   config/       constants and presets
+//   state/        store.js (the shared state) and actions.js (cross-component actions)
+//   models/       pure logic, no DOM: timeline maths, canvas geometry, camera/transition motion
+//   services/     server API, autosave, playback clock
+//   components/   one folder per area of the screen: stage, timeline, inspector, selection-bar, header
+//   controllers/  global input (keyboard)
+//   utils/        dom, math and formatting helpers
+import { drawProjectControls, bindProjectControls } from './components/header/project-controls.js';
+import { bindRenderButtons, poll } from './components/header/render-controls.js';
+import { bindInspector, renderPanel } from './components/inspector/inspector.js';
+import { drawSelectionBar } from './components/selection-bar/selection-bar.js';
+import { drawStage, layoutStage, rebuildCards } from './components/stage/stage.js';
+import { addZoom } from './components/timeline/timeline-actions.js';
+import { bindTimeline, drawPlayhead, drawTimeline, followPlayhead, layoutTimeline } from './components/timeline/timeline-view.js';
+import { bindKeyboard } from './controllers/keyboard.js';
+import { computeTimeline } from './models/timeline.js';
+import { api } from './services/api.js';
+import { changed } from './services/autosave.js';
+import { seek, togglePlay } from './services/playback.js';
+import { actions } from './state/actions.js';
+import { S, tagSegment } from './state/store.js';
+import { $, $$ } from './utils/dom.js';
+
+function update() {
+  if (!S.project) return;
+  drawStage();
+  drawPlayhead();
+}
 
 function layout() {
   if (!S.project) return;
@@ -44,7 +52,7 @@ function select(sel, redraw = true) {
   update();
 }
 
-Object.assign(app, { layout, update, drawTimeline, drawSelectionBar, renderPanel, rebuildCards, seek, select, changed });
+Object.assign(actions, { layout, update, drawTimeline, drawSelectionBar, followPlayhead, renderPanel, rebuildCards, seek, select, changed });
 
 async function load() {
   let pid = new URLSearchParams(location.search).get('project');
@@ -55,18 +63,14 @@ async function load() {
     }
     $('#loading').textContent = 'Preparing preview videos… (the first open of a recording takes a few seconds)';
     const st = await api('/api/state?project=' + encodeURIComponent(pid));
-    S.id = st.id;
-    S.project = st.project;
-    S.info = st.info;
-    S.server = st;
+    Object.assign(S, { id: st.id, project: st.project, info: st.info, server: st });
     if (st.missing.length) alert(`These recordings could not be found and were skipped:\n${st.missing.join('\n')}`);
   } catch (e) {
     $('#loading').innerHTML = `<div id="error">${e.message}</div>`;
     return;
   }
   S.project.clips.forEach((c) => (c.segments || []).forEach(tagSegment));
-  $('#projSelect').innerHTML = S.server.projects.map((p) => `<option value="${p.id}" ${p.id === S.id ? 'selected' : ''}>${p.title}</option>`).join('');
-  $('#titleInput').value = S.project.title || '';
+  drawProjectControls();
   $('#loading').remove();
   rebuildCards();
   renderPanel();
@@ -74,39 +78,10 @@ async function load() {
   poll();
 }
 
-function bindHeader() {
-  $('#playBtn').onclick = togglePlay;
-  $('#addBtn').onclick = () => addZoom(S.t);
-  $('#tlZoom').oninput = layout;
-  $('#projSelect').onchange = async (e) => { await flush(); location.search = '?project=' + encodeURIComponent(e.target.value); };
-  $('#titleInput').oninput = (e) => {
-    S.project.title = e.target.value;
-    const o = $(`#projSelect option[value="${S.id}"]`);
-    if (o) o.textContent = S.project.title || S.id;
-    changed({ redraw: false });
-  };
-  $('#newBtn').onclick = async () => { await flush(); location.search = '?project=' + (await api('/api/projects/new', {})).id; };
-  addEventListener('resize', layout);
-}
-
-function bindKeyboard() {
-  addEventListener('keydown', (e) => {
-    const typing = e.target.tagName === 'SELECT' || (e.target.tagName === 'INPUT' && !['range', 'checkbox', 'color'].includes(e.target.type));
-    if (!S.project || typing) return;
-    const k = e.key;
-    if (k === ' ') { e.preventDefault(); togglePlay(); }
-    else if (k === 'z' || k === 'Z') addZoom(S.t);
-    else if (k === 'Backspace' || k === 'Delete') { e.preventDefault(); deleteSelected(); }
-    else if (k === 'Escape') { if (S.cropping) { endCrop(); drawSelectionBar(); } else select(null); }
-    else if (k === 'ArrowLeft' || k === 'ArrowRight') {
-      e.preventDefault();
-      if (S.playing) pause();
-      seek(S.t + (k === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 1 : 1 / 30));
-    }
-  });
-}
-
-bindHeader();
+$('#playBtn').onclick = togglePlay;
+$('#addBtn').onclick = () => addZoom(S.t);
+addEventListener('resize', layout);
+bindProjectControls();
 bindKeyboard();
 bindTimeline();
 bindInspector();

@@ -1,8 +1,8 @@
-// Playback clock. The project time S.t drives everything; videos are kept in sync by the stage.
-import { app } from './app.js';
-import { S } from './state.js';
-import { $, clamp } from './util.js';
-import { timelineX } from './timeline.js';
+// Playback clock. Project time S.t drives everything; the stage keeps the videos in sync.
+import { actions } from '../state/actions.js';
+import { S } from '../state/store.js';
+import { $ } from '../utils/dom.js';
+import { clamp } from '../utils/math.js';
 
 let clock0 = 0, t0 = 0;
 
@@ -10,9 +10,8 @@ function loop() {
   if (!S.playing) return;
   S.t = t0 + (performance.now() - clock0) / 1000;
   if (S.t >= S.total) { S.t = S.total; pause(); return; }
-  app.update();
-  const x = timelineX(S.t), sc = $('#tlScroll');
-  if (x > sc.scrollLeft + sc.clientWidth - 60 || x < sc.scrollLeft) sc.scrollLeft = x - 80;
+  actions.update();
+  actions.followPlayhead();
   requestAnimationFrame(loop);
 }
 
@@ -29,7 +28,7 @@ export function play() {
 export function pause() {
   S.playing = false;
   $('#playBtn').textContent = '▶︎ Play';
-  app.update();
+  actions.update();
 }
 
 export const togglePlay = () => (S.playing ? pause() : play());
@@ -37,5 +36,5 @@ export const togglePlay = () => (S.playing ? pause() : play());
 export function seek(t) {
   S.t = clamp(t, 0, S.total);
   if (S.playing) { t0 = S.t; clock0 = performance.now(); }
-  app.update();
+  actions.update();
 }

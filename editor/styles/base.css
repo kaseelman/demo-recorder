@@ -1,0 +1,30 @@
+/* Design tokens, resets and shared controls (buttons, inputs, segmented controls). */
+:root {
+  --bg: #0e1014; --panel: #161920; --panel2: #1c2029; --panel3: #232835; --border: #272c37; --text: #e7e9ee;
+  --muted: #8b92a3; --accent: #8b7bff; --accent-bg: rgba(139, 123, 255, .22); --danger: #ff6b6b;
+  --click: #ffb454; --clip: #3a7bd5; --clip-bg: rgba(58, 123, 213, .28);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+body { display: grid; grid-template-rows: auto 1fr auto auto auto; overflow: hidden; user-select: none; }
+button, select, input { font: inherit; color: inherit; }
+button { background: var(--panel2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 11px;
+  cursor: pointer; white-space: nowrap; }
+button:hover:not(:disabled) { border-color: #3a4150; background: var(--panel3); }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover:not(:disabled) { background: #9a8cff; }
+button.on { background: var(--accent-bg); border-color: var(--accent); }
+select, input[type=text] { background: var(--panel2); border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px; }
+input[type=text] { width: 180px; }
+input[type=range] { accent-color: var(--accent); }
+input[type=checkbox] { accent-color: var(--accent); }
+input[type=color] { width: 30px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; }
+kbd { font: 11px ui-monospace, Menlo, monospace; background: var(--panel2); border: 1px solid var(--border);
+  border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; color: var(--muted); }
+
+.seg { display: flex; background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 2px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: none; padding: 5px 8px; border-radius: 6px; color: var(--muted); }
+.seg button.on { background: var(--panel3); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.tabs.seg { margin: 0; border-radius: 0; border: 0; border-bottom: 1px solid var(--border); padding: 10px; }

@@ -5,7 +5,7 @@ import webbrowser
 from pathlib import Path
 
 from .config import load_config
-from .paths import BACKGROUNDS, CONFIG, RECORDINGS
+from .paths import BACKGROUNDS, CONFIG, RECORDINGS, migrate_legacy_data
 
 
 def render_main(argv):
@@ -81,6 +81,7 @@ def edit_main(argv):
 
 
 def main():
+    migrate_legacy_data()
     commands = {"render": render_main, "edit": edit_main}
     if len(sys.argv) < 2 or sys.argv[1] not in commands:
         sys.exit("usage: python -m demorec.cli {render,edit} ...")

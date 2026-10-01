@@ -1,0 +1,4 @@
+#!/bin/sh
+# Refuses commits that contain recordings, projects or video files. Enabled by ./setup.sh
+# (git config core.hooksPath .githooks).
+git diff --cached --name-only --diff-filter=ACMR -z | xargs -0 sh "$(git rev-parse --show-toplevel)/scripts/check-no-private-files.sh"

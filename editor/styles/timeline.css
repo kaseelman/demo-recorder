@@ -1,0 +1,45 @@
+/* Timeline: ruler, clip lane, transitions, zoom blocks, clicks, playhead. */
+#timeline { height: 156px; background: var(--panel); border-top: 1px solid var(--border); position: relative; }
+#tlScroll { position: absolute; inset: 0; overflow-x: auto; overflow-y: hidden; }
+#tlInner { position: relative; height: 100%; }
+.lane-label { position: sticky; left: 0; width: 0; height: 0; z-index: 6; }
+#ruler { position: absolute; left: 0; right: 0; top: 0; height: 24px; border-bottom: 1px solid var(--border); cursor: text; }
+.tick { position: absolute; top: 0; height: 100%; border-left: 1px solid var(--border); padding: 4px 0 0 4px;
+  font: 10px ui-monospace, Menlo, monospace; color: var(--muted); pointer-events: none; }
+.tick.minor { top: 17px; height: 7px; padding: 0; }
+.lane { position: absolute; left: 0; right: 0; cursor: text; }
+#vidLane { top: 30px; height: 46px; }
+#zoomLane { top: 82px; height: 44px; }
+#clickLane { top: 130px; height: 16px; pointer-events: none; }
+.clip { position: absolute; top: 3px; height: 40px; background: var(--clip-bg); border: 1.5px solid rgba(58,123,213,.8);
+  border-radius: 7px; cursor: pointer; overflow: hidden; display: flex; align-items: center; padding: 0 12px; gap: 8px;
+  font-size: 12px; color: #d6e6ff; }
+.clip.alt { background: rgba(70, 160, 140, .28); border-color: rgba(70,160,140,.85); color: #d5f5ec; }
+.clip.sel { border-color: #fff; color: #fff; }
+.clip .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.clip .dur { opacity: .7; font: 11px ui-monospace, Menlo, monospace; white-space: nowrap; }
+.edge { position: absolute; top: 0; bottom: 0; width: 9px; cursor: ew-resize; z-index: 2; }
+.edge.l { left: 0; } .edge.r { right: 0; }
+.edge::after { content: ""; position: absolute; top: 12px; bottom: 12px; left: 3px; width: 2px; border-radius: 1px; background: rgba(255,255,255,.55); }
+.trans { position: absolute; top: 12px; height: 22px; min-width: 22px; margin-left: -11px; padding: 0 6px; border-radius: 11px;
+  background: #2a2f3b; border: 1.5px solid #4a5263; z-index: 4; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text); white-space: nowrap; }
+.trans:hover, .trans.sel { border-color: #fff; }
+.overlap { position: absolute; top: 3px; height: 40px; z-index: 3; pointer-events: none; border-radius: 7px;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,.12) 0 4px, transparent 4px 8px); }
+.addclip { position: absolute; top: 3px; height: 40px; width: 150px; border: 1.5px dashed #4a5263; border-radius: 7px; display: flex;
+  align-items: center; justify-content: center; color: var(--muted); cursor: pointer; gap: 6px; font-weight: 500; }
+.addclip:hover { border-color: var(--accent); color: var(--text); background: var(--accent-bg); }
+.block { position: absolute; top: 3px; height: 38px; background: var(--accent-bg); border: 1.5px solid rgba(139,123,255,.7);
+  border-radius: 6px; cursor: grab; overflow: hidden; display: flex; align-items: center; padding: 0 12px; gap: 6px;
+  font-size: 12px; font-weight: 600; color: #d9d4ff; }
+.block.sel { background: rgba(139,123,255,.42); border-color: #fff; color: #fff; }
+.block .ramp { position: absolute; top: 0; bottom: 0; pointer-events: none; }
+.block .ramp.in { left: 0; background: linear-gradient(90deg, rgba(139,123,255,.35), transparent); }
+.block .ramp.out { right: 0; background: linear-gradient(270deg, rgba(139,123,255,.35), transparent); }
+.block .follow { font-weight: 500; opacity: .75; font-size: 11px; }
+.lanebg { position: absolute; top: 0; bottom: 0; background: var(--panel2); border-radius: 6px; pointer-events: none; }
+.click { position: absolute; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--click); opacity: .85; }
+#playhead { position: absolute; top: 0; bottom: 0; width: 0; z-index: 8; pointer-events: none; }
+#playhead::before { content: ""; position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: #fff; }
+#playhead::after { content: ""; position: absolute; top: 0; left: -6px; border: 6px solid transparent; border-top: 8px solid #fff; }

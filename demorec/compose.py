@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 from .motion import ease_in_out
-from .paths import BACKGROUNDS
+from .paths import background_file
 
 TRANSITIONS = ["cut", "crossfade", "slide-left", "slide-up", "scale"]
 
@@ -43,7 +43,7 @@ def make_background(spec, w, h):
     """Matches the CSS used by the editor preview (linear/radial gradient semantics included)."""
     kind = spec.get("type", "image")
     if kind == "image":
-        img = cv2.imread(str(BACKGROUNDS / spec.get("image", "")))
+        img = cv2.imread(str(background_file(spec.get("image", ""))))
         if img is None:
             kind = "solid"
         else:

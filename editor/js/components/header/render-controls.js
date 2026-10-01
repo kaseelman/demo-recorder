@@ -1,8 +1,8 @@
 // Render buttons and progress display (renders run on the server, see demorec/server/jobs.py).
-import { api } from './api.js';
-import { flush } from './persistence.js';
-import { S } from './state.js';
-import { $, toast } from './util.js';
+import { api } from '../../services/api.js';
+import { flush } from '../../services/autosave.js';
+import { S } from '../../state/store.js';
+import { $, toast } from '../../utils/dom.js';
 
 let lastKind = null;
 

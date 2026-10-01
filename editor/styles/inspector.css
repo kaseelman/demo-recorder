@@ -1,0 +1,28 @@
+/* Right-hand settings panel. */
+aside { border-left: 1px solid var(--border); background: var(--panel); overflow-y: auto; padding: 0 0 20px; }
+.tabs { display: flex; gap: 4px; padding: 10px; position: sticky; top: 0; background: var(--panel); z-index: 2; border-bottom: 1px solid var(--border); }
+section { padding: 12px 14px 4px; }
+section h3 { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.row > label { color: var(--muted); width: 82px; flex: none; }
+.row input[type=range] { flex: 1; min-width: 0; }
+.row .val { font: 11.5px ui-monospace, Menlo, monospace; color: var(--muted); width: 36px; text-align: right; }
+.thumbs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.thumb { aspect-ratio: 16/9; border-radius: 8px; background-size: cover; background-position: center; cursor: pointer;
+  border: 2px solid transparent; outline: 1px solid rgba(255,255,255,.06); }
+.thumb:hover { outline-color: rgba(255,255,255,.25); }
+.thumb.on { border-color: var(--accent); }
+.swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px; }
+.swatch { aspect-ratio: 1; border-radius: 7px; cursor: pointer; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,.08); }
+.swatch.on { border-color: var(--accent); }
+.stops { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.hint { color: var(--muted); font-size: 11.5px; margin: 0 0 10px; }
+.aspects { display: flex; flex-wrap: wrap; gap: 6px; }
+.aspects button { padding: 4px 9px; }
+
+.cursor-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+.cursor-tile { aspect-ratio: 1; border-radius: 8px; background: linear-gradient(135deg, #e9e4ff, #c7d2fe); cursor: pointer;
+  border: 2px solid transparent; display: flex; align-items: center; justify-content: center; position: relative; }
+.cursor-tile.on { border-color: var(--accent); }
+.cursor-tile span { position: absolute; bottom: -18px; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.cursor-tiles { margin-bottom: 26px; }

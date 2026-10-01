@@ -4,7 +4,8 @@
 set -e
 ROOT="${0:A:h}"
 if [[ $# -eq 0 || $1 == --* ]]; then
-  LATEST=$(ls -d "$ROOT"/recordings/*/ 2>/dev/null | sort | tail -1)
+  DATA="${DEMOREC_DATA:-$HOME/Movies/Demo Recorder}"
+  LATEST=$(ls -d "$DATA"/recordings/*/ 2>/dev/null | sort | tail -1)
   [[ -z $LATEST ]] && { echo "No recordings yet. Run ./record first."; exit 1; }
   set -- "$LATEST" "$@"
 fi

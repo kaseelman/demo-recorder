@@ -1,15 +1,18 @@
 // The stage: a live preview of the output canvas (background, glass frames, recordings,
 // cursor, transitions). The camera transforms the whole canvas (#world), like the renderer.
 // Camera and cursor paths come from the server, so motion matches the render exactly.
-import { app } from './app.js';
-import { CURSORS, RIPPLE_SECONDS } from './constants.js';
-import { activeAt, backgroundCSS, blendCameras, cardGeometry, clipAspect, cropOf, FULL_CROP, localTime,
-  outputRatio, transitionPose } from './model.js';
-import { S, entryOf } from './state.js';
-import { $, clamp, easeInOut, fmt, sampleAt } from './util.js';
-import { drawAimFrame } from './aim.js';
-import { drawCropBox } from './crop.js';
-import { timelineX } from './timeline.js';
+import { RIPPLE_SECONDS } from '../../config/constants.js';
+import { backgroundCSS } from '../../models/background.js';
+import { cardGeometry, clipAspect, cropOf, FULL_CROP, outputRatio } from '../../models/geometry.js';
+import { blendCameras, transitionPose } from '../../models/motion.js';
+import { activeAt, localTime } from '../../models/timeline.js';
+import { actions } from '../../state/actions.js';
+import { S, entryOf } from '../../state/store.js';
+import { $ } from '../../utils/dom.js';
+import { clamp, easeInOut, sampleAt } from '../../utils/math.js';
+import { drawAimFrame } from './aim-frame.js';
+import { drawCropBox } from './crop-box.js';
+import { cursorSVG } from './cursor-svg.js';
 
 const cards = {};  // clip id -> { el, screen, layer, video, cursor, ripple, g (geometry), unit }
 
@@ -25,18 +28,12 @@ export function rebuildCards() {
     $('#world').appendChild(el);
     const video = $('video', el);
     video.src = '/video?recording=' + encodeURIComponent(c.recording);
-    video.addEventListener('seeked', () => { if (!S.playing) update(); });
-    video.addEventListener('loadeddata', () => update());
+    video.addEventListener('seeked', () => { if (!S.playing) actions.update(); });
+    video.addEventListener('loadeddata', () => actions.update());
     el.addEventListener('pointerdown', (e) => clickStage(e, c.id));
     cards[c.id] = { el, screen: $('.screen', el), layer: $('.layer', el), video, cursor: $('.cursor', el), ripple: $('.ripple', el) };
   }
   $('#empty').style.display = S.project.clips.length ? 'none' : 'flex';
-}
-
-function cursorSVG(style, unit) {
-  const c = CURSORS[style] || CURSORS.arrow, [x, y, w, h] = c.box;
-  return `<svg viewBox="${c.box.join(' ')}" width="${w * unit}" height="${h * unit}"
-    style="left:${x * unit}px;top:${y * unit}px">${c.svg}</svg>`;
 }
 
 /** Size the stage to the output aspect and lay out every clip's glass frame. */
@@ -85,11 +82,9 @@ function cameraAt(e) {
   return { z: sampleAt(P.z, P.fps, lt), x: sampleAt(P.x, P.fps, lt), y: sampleAt(P.y, P.fps, lt) };
 }
 
-/** Redraw for the current time. Called every animation frame while playing. */
-export function update() {
+/** Redraw the stage for the current time. Called every animation frame while playing. */
+export function drawStage() {
   if (!S.project) return;
-  $('#time').textContent = `${fmt(S.t)} / ${fmt(S.total)}`;
-  $('#playhead').style.left = timelineX(S.t) + 'px';
   const act = activeAt(S.timeline, S.total, S.t);
   // Aiming a zoom or cropping shows that clip un-zoomed so you can see the whole canvas.
   const editId = S.cropping || (S.sel && S.sel.kind === 'zoom' && !S.playing ? S.sel.clip : null);
@@ -171,5 +166,5 @@ function clickStage(e, clipId) {
   if (e.target.closest('#frame') || e.target.closest('#cropBox') || S.cropping) return;
   const en = entryOf(clipId), lt = localTime(en, S.t);
   const s = (en.clip.segments || []).find((s) => lt >= s.start && lt < s.end);
-  if (s) app.select({ kind: 'zoom', clip: clipId, sid: s._id });
+  if (s) actions.select({ kind: 'zoom', clip: clipId, sid: s._id });
 }

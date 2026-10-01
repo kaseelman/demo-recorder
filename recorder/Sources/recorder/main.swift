@@ -28,7 +28,7 @@ func usage() -> Never {
     print("""
     usage: recorder [--out DIR] [--fps 60] [--display N] [--countdown 3] [--show-cursor] [--list-displays]
 
-      --out DIR        output folder (default: ./recordings/<timestamp>)
+      --out DIR        output folder (default: ~/Movies/Demo Recorder/recordings/<timestamp>)
       --fps N          capture frame rate (default 60)
       --display N      display index from --list-displays (default: display under the mouse)
       --countdown N    seconds before recording starts (default 3)
@@ -343,7 +343,9 @@ SCShareableContent.getExcludingDesktopWindows(false, onScreenWindowsOnly: true) 
             outDir = o
         } else {
             let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-            outDir = URL(fileURLWithPath: "recordings").appendingPathComponent(f.string(from: Date()))
+            let data = ProcessInfo.processInfo.environment["DEMOREC_DATA"].map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) }
+                ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Movies/Demo Recorder")
+            outDir = data.appendingPathComponent("recordings").appendingPathComponent(f.string(from: Date()))
         }
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
         let videoURL = outDir.appendingPathComponent("raw.mov")

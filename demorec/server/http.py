@@ -5,7 +5,7 @@ import socket
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
-from ..paths import BACKGROUNDS, EDITOR
+from ..paths import BACKGROUNDS, EDITOR, UPLOADS
 from . import api, jobs
 from .media import ensure_proxy, get_recording
 
@@ -82,6 +82,8 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == "/":
                 return self.send_file(EDITOR / "index.html")
             if u.path.startswith("/editor/") and (p := _inside(EDITOR, u.path[len("/editor/"):])):
+                return self.send_file(p)
+            if u.path.startswith("/bg/uploads/") and (p := _inside(UPLOADS, u.path[len("/bg/uploads/"):])):
                 return self.send_file(p)
             if u.path.startswith("/bg/") and (p := _inside(BACKGROUNDS, u.path[4:])):
                 return self.send_file(p)

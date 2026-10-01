@@ -15,20 +15,25 @@ the browser to see changes. Python changes need a restart of `./edit`.
 
 ## Where things go
 
-The code is split by responsibility. Please keep it that way:
+[ARCHITECTURE.md](ARCHITECTURE.md) has the full map. In short:
 
-- **Pure logic** (maths, planning, data) never touches I/O or the DOM. Python examples are `motion.py`, `camera.py`,
-  `layout.py` and `project.py`. The JS equivalent is `editor/js/model.js`. These are the easiest to unit-test.
-- **Rendering** (pixels) lives in `cursor.py`, `compose.py` and `clip.py`. `export.py` drives a whole project
-  through them and encodes the result.
-- **The server** (`demorec/server/`) only translates HTTP into calls to `api.py`. Editor operations belong in `api.py`,
-  routing in `http.py`.
-- **Editor views** each own one area of the page (`stage.js`, `timeline.js`, `inspector.js`, `selection-bar.js`).
-  Shared state is in `state.js`. Views call each other through `app.js` to avoid import cycles.
+- **Pure logic** (maths, planning, data) never does I/O or touches the DOM. In Python that means `motion.py`, `camera.py`,
+  `layout.py` and `project.py`. In JS it means `editor/js/models/` and `utils/`. These are the easiest to unit-test.
+- **Rendering** (pixels) lives in `cursor.py`, `compose.py` and `clip.py`. `export.py` drives a whole project.
+- **Server**: `demorec/server/http.py` only routes. Editor operations live in `api.py`.
+- **Editor**: one folder per screen area under `editor/js/components/`. Shared state is in `state/store.js`, and components
+  talk to each other through `state/actions.js`. Server calls go through `services/api.js`.
 
-The editor preview and the renderer must agree. If you change the layout, the camera or a transition in Python,
-mirror it in `editor/js/model.js` and `stage.js` (each has a comment pointing at its counterpart). Camera and
-cursor paths are computed by the server, so they always match.
+The editor preview and the renderer must agree: if you change layout, transitions or backgrounds in Python, mirror it in
+`editor/js/models/` and the stage. Camera and cursor paths always come from the server.
+
+Using an AI assistant? Point it at [AGENTS.md](AGENTS.md).
+
+## Keep recordings out of the repo
+
+Your data lives in `~/Movies/Demo Recorder/`. `setup.sh` enables a pre-commit hook that refuses video files, recordings and
+projects, and CI checks the same. Please don't bypass them (`--no-verify`). For test media, generate a synthetic
+recording (see AGENTS.md).
 
 ## Pull requests
 
@@ -36,7 +41,6 @@ cursor paths are computed by the server, so they always match.
   before/after frame or a short clip.
 - Add or update tests in `tests/` for logic changes.
 - Match the surrounding style: small functions, docstrings that explain *why*, no unused code.
-- Never commit recordings or projects. They're git-ignored for a reason.
 
 ## License of contributions
 

@@ -1,10 +1,11 @@
 // Aiming a zoom block: the purple frame over the canvas that you drag and resize.
 // A block stores its zoom (relative to the canvas) and the recording point it centres on.
-import { app } from './app.js';
-import { MAX_ZOOM } from './constants.js';
-import { canvasToRec, clampSegment, recToCanvas } from './model.js';
-import { S, selectedSegment } from './state.js';
-import { $, clamp, drag } from './util.js';
+import { MAX_ZOOM } from '../../config/constants.js';
+import { canvasToRec, clampSegment, recToCanvas } from '../../models/geometry.js';
+import { actions } from '../../state/actions.js';
+import { S, selectedSegment } from '../../state/store.js';
+import { $, drag } from '../../utils/dom.js';
+import { clamp } from '../../utils/math.js';
 
 const frame = document.createElement('div');
 frame.id = 'frame';
@@ -39,7 +40,7 @@ frame.addEventListener('pointerdown', (e) => {
   if (!s || !current) return;
   e.preventDefault();
   e.stopPropagation();
-  const g = current.g, ow = S.stage.w, oh = S.stage.h, clipId = S.sel.clip;
+  const g = current.g, ow = S.stage.w, oh = S.stage.h;
   const rect = $('#stage').getBoundingClientRect(), corner = e.target.dataset.c;
   const [cx0, cy0] = recToCanvas(g, s.x, s.y), x0 = e.clientX, y0 = e.clientY, w0 = ow / s.zoom, h0 = oh / s.zoom;
   // While resizing, the opposite corner stays put.
@@ -57,9 +58,9 @@ frame.addEventListener('pointerdown', (e) => {
     [s.x, s.y] = canvasToRec(g, cx, cy);
     s.follow = false;  // aimed by hand: keep this framing
     clampSegment(s, g, ow, oh);
-    app.update();
-    app.drawSelectionBar();
-  }, () => app.changed({ clip: clipId }));
+    actions.update();
+    actions.drawSelectionBar();
+  }, () => actions.changed());
 });
 
 frame.addEventListener('wheel', (e) => {
@@ -67,7 +68,7 @@ frame.addEventListener('wheel', (e) => {
   if (!s) return;
   e.preventDefault();
   setZoom(s, s.zoom * Math.exp(-e.deltaY * 0.002));
-  app.update();
+  actions.update();
   syncZoomLabels(s);
-  app.changed({ redraw: false, clip: S.sel.clip });
+  actions.changed({ redraw: false });
 }, { passive: false });

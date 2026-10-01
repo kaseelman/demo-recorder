@@ -6,7 +6,7 @@ __pycache__/
 # Swift
 recorder/.build/
 
-# Your data (never committed)
+# Your data lives in ~/Movies/Demo Recorder, outside the repo. These catch anything left behind.
 recordings/
 projects/
 backgrounds/uploads/

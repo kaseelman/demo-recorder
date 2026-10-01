@@ -1,5 +1,5 @@
-// Thin client for the local editor server (demorec/server/http.py).
-import { S } from './state.js';
+// Client for the local editor server (demorec/server/http.py).
+import { S } from '../state/store.js';
 
 export async function api(url, body) {
   const opt = body === undefined ? {} : {

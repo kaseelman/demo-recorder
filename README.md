@@ -59,7 +59,7 @@ Restart the terminal after granting them.
 ```
 
 There's a 3-second countdown, then it records the display your mouse is on. Do your demo, then press **⌃⌥⌘S**
-(or Ctrl-C in the terminal) to stop. The recording is saved to `recordings/<date_time>/`.
+(or Ctrl-C in the terminal) to stop. The recording is saved to `~/Movies/Demo Recorder/recordings/<date_time>/`.
 
 Tips:
 
@@ -88,13 +88,20 @@ This opens the editor in your browser with your latest recording, with automatic
 | Transition | Click the badge between two clips: cut, fade, slide or scale, plus a duration |
 | Look | Right panel: **Background**, **Frame** (padding, corners, glass, shadow), **Cursor** (style, size, smoothing, motion blur), **Output** (aspect ratio, resolution) |
 
-Everything saves automatically to `projects/<id>/project.json`. The preview shows exactly the camera motion the
+Everything saves automatically to `~/Movies/Demo Recorder/projects/<id>/project.json`. The preview shows exactly the camera motion the
 render will use, because both come from the same code.
 
 ### 3. Render
 
 Click **Render preview** for a quick half-size check, or **Render final** for the full-quality video. Then click
-**Open** or **Show in Finder**. Videos are saved to `projects/<id>/final.mp4`.
+**Open** or **Show in Finder**. Videos are saved to `~/Movies/Demo Recorder/projects/<id>/final.mp4`.
+
+## Your recordings stay private
+
+Your recordings, projects and videos are stored in **`~/Movies/Demo Recorder/`**, outside the repository, so they
+can never be committed by accident. (Set the `DEMOREC_DATA` environment variable to use another folder.) As
+extra safety, a pre-commit hook (enabled by `setup.sh`) and a GitHub check refuse any commit that contains
+video files, recordings or projects.
 
 ## Command line
 
@@ -102,10 +109,10 @@ You can do everything without the editor too:
 
 ```bash
 ./render                                  # latest recording, automatic zooms -> final.mp4 in its folder
-./render recordings/2026-10-01_14-03-12 --preview
-./render projects/2026-10-01_14-10-00     # render an editor project
+./render ~/Movies/Demo\ Recorder/recordings/2026-10-01_14-03-12 --preview
+./render ~/Movies/Demo\ Recorder/projects/2026-10-01_14-10-00     # render an editor project
 ./render <recording> --trim-start 1.5 --trim-end 2 --max-zoom 1.3 --no-blur -o demo.mp4
-./edit recordings/<folder>                # start a new project from a specific recording
+./edit <recording-folder>                 # start a new project from a specific recording
 ```
 
 `config.toml` holds the defaults: how zooms are planned, camera timing, cursor, and the look of standalone
@@ -129,24 +136,14 @@ renders. Every setting is commented.
 record, render, edit, setup.sh   command-line entry points
 config.toml                      defaults (commented)
 recorder/                        Swift screen + mouse recorder
-demorec/                         Python package
-  paths.py  config.py            where things live, settings
-  recording.py                   loading a recording (video + events)
-  motion.py  tracking.py         easing/smoothing primitives, cursor path over time
-  camera.py                      zoom planning + camera motion
-  layout.py                      where each recording sits on the canvas (frame, crop)
-  cursor.py                      cursor styles and click ripples
-  compose.py                     backgrounds, glass frame, transitions
-  clip.py                        renders one clip frame by frame
-  project.py  export.py          project model, rendering a project to mp4
-  backgrounds.py                 generates the wallpaper presets
-  server/                        editor backend: http (routing), api, media (previews), jobs (renders)
-  cli.py                         `render` and `edit` commands
-editor/                          editor frontend (plain HTML/CSS/ES modules, no build step)
-  index.html  styles.css
-  js/                            state, model (pure logic), stage, timeline, inspector, … (see js/main.js)
-tests/                           python -m unittest discover -s tests -t .
+demorec/                         Python package: planning, compositing, export, editor server
+editor/                          browser editor (HTML/CSS/ES modules, no build step)
+tests/                           unit tests
+scripts/, .githooks/, .github/   privacy guard (hook + CI) and checks
 ```
+
+[ARCHITECTURE.md](ARCHITECTURE.md) explains every module, the coordinate spaces and how data flows.
+AI assistants: see [AGENTS.md](AGENTS.md).
 
 ## Contributing
 

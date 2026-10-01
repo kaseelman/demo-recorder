@@ -1,7 +1,8 @@
 // Cropping a clip: a yellow box over the full recording. The cropped area fills the frame.
-import { app } from './app.js';
-import { clipById, S } from './state.js';
-import { clamp, drag } from './util.js';
+import { actions } from '../../state/actions.js';
+import { clipById, S } from '../../state/store.js';
+import { drag } from '../../utils/dom.js';
+import { clamp } from '../../utils/math.js';
 
 const MIN = 0.1;
 const box = document.createElement('div');
@@ -15,13 +16,13 @@ export function startCrop(clipId) {
   S.cropping = clipId;
   const c = clipById(clipId);
   c.crop = { x: 0, y: 0, w: 1, h: 1, ...(c.crop || {}) };
-  app.layout();
+  actions.layout();
 }
 
 export function endCrop() {
   if (!S.cropping) return;
   S.cropping = null;
-  app.changed({ relayout: true });
+  actions.changed({ relayout: true });
 }
 
 /** Quick presets: macOS menu bar is ~25pt (37pt with a notch) of a ~980pt-tall screen. */
@@ -30,7 +31,7 @@ export function applyCropPreset(name) {
   if (name === 'menubar' && c.crop.y < 0.035) { c.crop.h -= 0.035 - c.crop.y; c.crop.y = 0.035; }
   if (name === 'dock') c.crop.h = Math.min(c.crop.h, 0.93 - c.crop.y);  // dock ≈ 70pt
   if (name === 'reset') c.crop = { x: 0, y: 0, w: 1, h: 1 };
-  app.update();
+  actions.update();
 }
 
 export function drawCropBox(card) {

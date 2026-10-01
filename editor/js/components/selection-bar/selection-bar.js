@@ -1,11 +1,12 @@
 // The context bar under the stage: edit whatever is selected (zoom block, clip or transition).
-import { app } from './app.js';
-import { MAX_ZOOM, TRANSITION_LABELS } from './constants.js';
-import { applyCropPreset, endCrop, startCrop } from './crop.js';
-import { S, clipById, entryOf, selectedSegment } from './state.js';
-import { $, $$, recLabel } from './util.js';
-import { setZoom, syncZoomLabels } from './aim.js';
-import { deleteSelected, moveClip, removeClip } from './timeline.js';
+import { MAX_ZOOM, TRANSITION_LABELS } from '../../config/constants.js';
+import { actions } from '../../state/actions.js';
+import { S, clipById, entryOf, selectedSegment } from '../../state/store.js';
+import { $, $$ } from '../../utils/dom.js';
+import { recLabel } from '../../utils/format.js';
+import { setZoom, syncZoomLabels } from '../stage/aim-frame.js';
+import { applyCropPreset, endCrop, startCrop } from '../stage/crop-box.js';
+import { deleteSelected, moveClip, removeClip } from '../timeline/timeline-actions.js';
 
 export function drawSelectionBar() {
   const bar = $('#selBar'), sel = S.sel;
@@ -24,9 +25,9 @@ function drawZoomBar(bar) {
       <span id="zoomVal" style="font:12px ui-monospace,Menlo,monospace;min-width:40px">${s.zoom.toFixed(2)}×</span></label>
     <label title="While zoomed, pan along when the cursor nears the edge"><input id="followChk" type="checkbox" ${s.follow ? 'checked' : ''}> Follow cursor</label>
     <button id="delBtn">Delete</button>`;
-  $('#zoomRange').oninput = (e) => { setZoom(s, +e.target.value); syncZoomLabels(s); app.update(); app.changed({ redraw: false, clip: S.sel.clip }); };
-  $('#zoomRange').onchange = () => app.drawTimeline();
-  $('#followChk').onchange = (e) => { s.follow = e.target.checked; app.changed({ clip: S.sel.clip }); };
+  $('#zoomRange').oninput = (e) => { setZoom(s, +e.target.value); syncZoomLabels(s); actions.update(); actions.changed({ redraw: false }); };
+  $('#zoomRange').onchange = () => actions.drawTimeline();
+  $('#followChk').onchange = (e) => { s.follow = e.target.checked; actions.changed(); };
   $('#delBtn').onclick = deleteSelected;
 }
 
@@ -39,7 +40,7 @@ function drawClipBar(bar) {
     <button id="cropBtn" title="Cut away the menu bar, dock or anything else">${cropped ? 'Edit crop' : 'Crop…'}</button>
     <button id="mvL" ${i === 0 ? 'disabled' : ''}>◀ Move</button><button id="mvR" ${i === S.project.clips.length - 1 ? 'disabled' : ''}>Move ▶</button>
     <button id="rmClip">Remove</button>`;
-  $('#cropBtn').onclick = () => { const en = entryOf(c.id); if (S.t < en.start || S.t >= en.start + en.len) app.seek(en.start + 0.1); startCrop(c.id); drawSelectionBar(); };
+  $('#cropBtn').onclick = () => { const en = entryOf(c.id); if (S.t < en.start || S.t >= en.start + en.len) actions.seek(en.start + 0.1); startCrop(c.id); drawSelectionBar(); };
   $('#mvL').onclick = () => moveClip(c.id, -1);
   $('#mvR').onclick = () => moveClip(c.id, 1);
   $('#rmClip').onclick = () => removeClip(c.id);
@@ -66,8 +67,8 @@ function drawTransitionBar(bar) {
       <span id="transVal" style="font:12px ui-monospace,Menlo,monospace">${tr.duration.toFixed(2)}s</span></label>`;
   $$('#transSeg button', bar).forEach((b) => (b.onclick = () => {
     tr.type = b.dataset.t;
-    app.changed({ relayout: true });
-    app.seek(Math.max(0, entryOf(c.id).start - 0.4));
+    actions.changed({ relayout: true });
+    actions.seek(Math.max(0, entryOf(c.id).start - 0.4));
   }));
-  $('#transDur').oninput = (e) => { tr.duration = +e.target.value; $('#transVal').textContent = tr.duration.toFixed(2) + 's'; app.changed({ relayout: true }); };
+  $('#transDur').oninput = (e) => { tr.duration = +e.target.value; $('#transVal').textContent = tr.duration.toFixed(2) + 's'; actions.changed({ relayout: true }); };
 }
