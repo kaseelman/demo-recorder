@@ -55,11 +55,18 @@ Restart the terminal after granting them.
 ### 1. Record
 
 ```bash
-./record
+./edit
 ```
 
-There's a 3-second countdown, then it records the display your mouse is on. Do your demo, then press **⌃⌥⌘S**
-(or Ctrl-C in the terminal) to stop. The recording is saved to `~/Movies/Demo Recorder/recordings/<date_time>/`.
+Click **Record** in the editor, then choose **Entire screen** or a **Window** (with live thumbnails), and press
+**Start recording**. After a short countdown, switch to the app you want to show and do your demo. To stop, use any of these:
+
+- click the **● timer in the menu bar**
+- press **⌃⌥⌘S**
+- press **Stop** in the editor
+
+The recording is added to your project automatically, with zooms already placed. You can also record from the
+terminal with `./record`. The recording is saved to `~/Movies/Demo Recorder/recordings/<date_time>/`.
 
 Tips:
 

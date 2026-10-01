@@ -19,7 +19,7 @@ export function showAddMenu(anchor) {
 
 export const hideAddMenu = () => ($('#popover').style.display = 'none');
 
-async function addRecording(name) {
+export async function addRecording(name) {
   hideAddMenu();
   toast('Adding recording… (preparing preview video)');
   try {

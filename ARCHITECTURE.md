@@ -12,8 +12,12 @@ record ──► raw.mov + events.json ──► plan camera ──► composite
                    └──── editor (browser) ─┘  edits project.json, previews with the same camera maths
 ```
 
-1. **Record** (`recorder/`, Swift + ScreenCaptureKit). Captures the screen at native resolution *without* the
-   system cursor, and logs every mouse move and click on the same clock.
+1. **Record** (`recorder/`, Swift + ScreenCaptureKit). Captures a display or a single window at native resolution
+   *without* the system cursor, and logs every mouse move and click on the same clock. Files:
+   `Options.swift` (CLI + STATUS protocol), `EventLog.swift` (mouse taps, stop hotkey), `Capture.swift` (stream →
+   HEVC), `Sources.swift` (`--list-json`: displays and windows with thumbnails), `RecorderUI.swift` (countdown overlay,
+   menu bar timer; both excluded from the capture) and `main.swift` (the flow). The editor starts it through
+   `demorec/server/capture.py` and follows its `STATUS …` lines.
 2. **Plan** (`demorec/camera.py`). Works out the camera after the fact from the click history: where to zoom,
    when, and how to move between targets (eased moves of fixed length). Because it runs afterwards, it can
    start moving *before* a click.
@@ -77,6 +81,7 @@ Ordered from pure logic to I/O:
 | `server/api.py` | editor operations (load, save, add recording, upload, render) | project, camera |
 | `server/media.py` | preview proxies, recording cache | recording |
 | `server/jobs.py` | background render subprocess + progress | — |
+| `server/capture.py` | starts/stops the Swift recorder, lists screens and windows | paths |
 | `cli.py` | `render` and `edit` commands | export, server |
 
 Rule of thumb: maths goes in `motion` / `camera` / `layout`, pixels in `cursor` / `compose` / `clip`, files in
@@ -89,20 +94,21 @@ Plain HTML, CSS and ES modules. There is no build step and no framework.
 ```
 editor/
   index.html                 markup only
-  styles/                    base, layout, stage, inspector, timeline
+  styles/                    base (tokens), layout, stage, inspector, timeline, empty-states, recorder
   js/
     main.js                  entry: loads the project, wires components, fills in state/actions.js
     config/constants.js      presets, cursor SVGs, limits
     state/store.js           the single shared state object `S` + selection helpers
     state/actions.js         cross-component actions (layout, update, select, changed, …)
     models/                  PURE logic, no DOM: timeline.js, geometry.js, motion.js, background.js
-    services/                api.js (server client), autosave.js, playback.js (clock)
+    services/                api.js (server client), autosave.js, playback.js (clock), capture.js (recording)
     components/
       stage/                 live canvas preview, aim-frame (zoom aiming), crop-box, cursor-svg
       timeline/              timeline-view (drawing + drag), timeline-actions (edits), add-recording-menu
       inspector/             right panel: one file per tab + shared form controls
       selection-bar/         context bar for the selected zoom/clip/transition
-      header/                project controls, render controls
+      header/                project controls, render controls, shortcuts card
+      recorder/              Record dialog: pick a screen or window, countdown, live timer, auto-add
     controllers/keyboard.js  global shortcuts
     utils/                   dom.js, math.js, format.js
 ```

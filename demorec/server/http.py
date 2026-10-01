@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
 from ..paths import BACKGROUNDS, EDITOR, UPLOADS
-from . import api, jobs
+from . import api, capture, jobs
 from .media import ensure_proxy, get_recording
 
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp",
@@ -68,7 +68,7 @@ class Handler(BaseHTTPRequestHandler):
             return fn()
         except (FileNotFoundError, KeyError) as e:
             return self.send_json({"error": str(e)}, 404)
-        except ValueError as e:
+        except (ValueError, PermissionError) as e:
             return self.send_json({"error": str(e)}, 400)
         except Exception as e:  # surface problems in the UI instead of a blank page
             return self.send_json({"error": f"{type(e).__name__}: {e}"}, 500)
@@ -95,6 +95,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(api.add_recording(q["project"], q["name"], float(q.get("smoothing", 0.1))))
             if u.path == "/api/render":
                 return self.send_json(jobs.current())
+            if u.path == "/api/capture/sources":
+                return self.send_json(capture.list_sources())
+            if u.path == "/api/capture":
+                return self.send_json(capture.current())
+            if u.path.startswith("/capture-thumbs/") and (p := capture.thumb_path(unquote(u.path[len("/capture-thumbs/"):]))):
+                return self.send_file(p)
             self.send_error(404)
         self._guard(route)
 
@@ -109,6 +115,10 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == "/api/upload":
                 return self.send_json(api.upload_background(unquote(self.headers.get("X-Filename", "image.jpg")), raw))
             data = json.loads(raw or b"{}")
+            if u.path == "/api/capture/start":
+                return self.send_json(capture.start(data["kind"], data["id"], data.get("countdown", 3)))
+            if u.path == "/api/capture/stop":
+                return self.send_json(capture.stop())
             if u.path == "/api/projects/new":
                 return self.send_json(api.new_project(data.get("recording")))
             pid = data["project_id"]

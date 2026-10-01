@@ -28,6 +28,11 @@ welcome to follow them too. Start with [ARCHITECTURE.md](ARCHITECTURE.md) for th
 
 - Python 3.11+, standard library + numpy + OpenCV only. Avoid new dependencies unless clearly worth it.
 - JS: modern ES modules, no framework, no build step, no npm packages.
+- Visual style: calm and monochrome (Mobbin-like). Primary action = white pill with black text, secondary = outlined
+  pill, selection = white. Colour only carries meaning: red = recording, orange = clicks. Use the tokens in
+  `editor/styles/base.css` and avoid new gradients.
+- Testing the record flow without capturing a real screen: set `DEMOREC_RECORDER` to a stand-in script that speaks
+  the same CLI and `STATUS …` protocol (see `demorec/server/capture.py`).
 - Comments explain *why*, not *what*. Module docstrings and header comments state the file's responsibility.
 - Names: Python `snake_case`, JS `camelCase`, files in `kebab-case.js`.
 - Match the density and style of the surrounding code. Keep functions small.

@@ -4,12 +4,13 @@
 //   state/        store.js (the shared state) and actions.js (cross-component actions)
 //   models/       pure logic, no DOM: timeline maths, canvas geometry, camera/transition motion
 //   services/     server API, autosave, playback clock
-//   components/   one folder per area of the screen: stage, timeline, inspector, selection-bar, header
+//   components/   one folder per area of the screen: stage, timeline, inspector, selection-bar, header, recorder
 //   controllers/  global input (keyboard)
 //   utils/        dom, math and formatting helpers
 import { bindHelp } from './components/header/help.js';
 import { drawProjectControls, bindProjectControls } from './components/header/project-controls.js';
 import { bindRenderButtons, poll } from './components/header/render-controls.js';
+import { bindRecordDialog } from './components/recorder/record-dialog.js';
 import { bindInspector, renderPanel } from './components/inspector/inspector.js';
 import { drawSelectionBar } from './components/selection-bar/selection-bar.js';
 import { drawStage, layoutStage, rebuildCards } from './components/stage/stage.js';
@@ -88,4 +89,5 @@ bindKeyboard();
 bindTimeline();
 bindInspector();
 bindRenderButtons();
+bindRecordDialog();
 load();

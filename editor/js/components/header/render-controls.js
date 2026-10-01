@@ -8,7 +8,7 @@ let lastKind = null, wasRunning = false;
 
 /** A little confetti pop from an element: the render is done! */
 function burst(el) {
-  const r = el.getBoundingClientRect(), colors = ['#9d8cff', '#ff7ac6', '#5ee6d0', '#ffd54a', '#ffffff'];
+  const r = el.getBoundingClientRect(), colors = ['#ffffff', '#d4d4d4', '#a1a1a1'];
   for (let i = 0; i < 18; i++) {
     const p = document.createElement('span'), a = (i / 18) * Math.PI * 2, d = 40 + Math.random() * 50;
     p.className = 'burst';

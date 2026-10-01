@@ -34,6 +34,7 @@ export function rebuildCards() {
     cards[c.id] = { el, screen: $('.screen', el), layer: $('.layer', el), video, cursor: $('.cursor', el), ripple: $('.ripple', el) };
   }
   $('#empty').style.display = S.project.clips.length ? 'none' : 'flex';
+  $('#stageWrap').classList.toggle('is-empty', !S.project.clips.length);
 }
 
 /** Size the stage to the output aspect and lay out every clip's glass frame. */
