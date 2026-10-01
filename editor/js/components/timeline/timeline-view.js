@@ -48,7 +48,8 @@ export function drawTimeline() {
   let vh = '', zh = `<div class="lanebg" style="left:${timelineX(0)}px;width:${S.total * pps}px"></div>`, ch = '';
   for (const e of S.timeline) {
     const c = e.clip, inf = S.info[c.id], w = e.len * pps;
-    vh += `<div class="clip ${e.i % 2 ? 'alt' : ''} ${isSel('clip', c.id) ? 'sel' : ''}" data-clip="${c.id}" style="left:${timelineX(e.start)}px;width:${w}px;z-index:${e.i + 1}">
+    const pad = e.i > 0 ? e.d * pps / 2 + 46 : 14;  // keep the label clear of the transition chip
+    vh += `<div class="clip ${e.i % 2 ? 'alt' : ''} ${isSel('clip', c.id) ? 'sel' : ''}" data-clip="${c.id}" style="left:${timelineX(e.start)}px;width:${w}px;z-index:${e.i + 1};padding-left:${pad}px">
       ${w > 70 ? `<span class="name">${e.i + 1} · ${recLabel(c.recording)}</span>` : ''}${w > 190 ? `<span class="dur">${fmt(e.len)}</span>` : ''}
       <div class="edge l"></div><div class="edge r"></div></div>`;
     if (e.i > 0) {
@@ -96,7 +97,8 @@ export function bindTimeline() {
     });
   }
   $('#zoomLane').addEventListener('dblclick', (e) => { if (!e.target.closest('.block')) addZoom(timeAt(e.clientX)); });
-  addEventListener('pointerdown', (e) => { if (!e.target.closest('#popover') && !e.target.closest('#addClip')) hideAddMenu(); });
+  addEventListener('pointerdown', (e) => { if (!e.target.closest('#popover, #addClip, #emptyAdd')) hideAddMenu(); });
+  $('#emptyAdd').addEventListener('pointerdown', (e) => { e.stopPropagation(); showAddMenu(e.currentTarget); });
   $('#tlZoom').oninput = () => actions.layout();
   $('#tlScroll').addEventListener('wheel', (e) => {
     if (!(e.metaKey || e.ctrlKey)) return;

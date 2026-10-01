@@ -21,13 +21,13 @@ export function play() {
   S.playing = true;
   clock0 = performance.now();
   t0 = S.t;
-  $('#playBtn').textContent = '❚❚ Pause';
+  $('#playBtn').classList.add('playing');
   requestAnimationFrame(loop);
 }
 
 export function pause() {
   S.playing = false;
-  $('#playBtn').textContent = '▶︎ Play';
+  $('#playBtn').classList.remove('playing');
   actions.update();
 }
 

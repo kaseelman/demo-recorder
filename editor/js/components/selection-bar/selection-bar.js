@@ -11,7 +11,7 @@ import { deleteSelected, moveClip, removeClip } from '../timeline/timeline-actio
 export function drawSelectionBar() {
   const bar = $('#selBar'), sel = S.sel;
   if (S.cropping) return drawCropBar(bar);
-  if (!sel) { bar.innerHTML = '<span>Select a zoom, clip or transition to edit it</span>'; return; }
+  if (!sel) { bar.innerHTML = '<span>Tip: click a zoom, clip or transition to edit it</span>'; return; }
   if (sel.kind === 'zoom') drawZoomBar(bar);
   else if (sel.kind === 'clip') drawClipBar(bar);
   else if (sel.kind === 'trans') drawTransitionBar(bar);

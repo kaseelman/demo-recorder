@@ -11,8 +11,9 @@ export function showAddMenu(anchor) {
     ? S.server.recordings.map((n) => `<div class="item" data-rec="${n}"><span>${recLabel(n)}</span><small>${used.has(n) ? 'in project' : ''}</small></div>`).join('')
     : '<div class="item"><small>No recordings yet. Run ./record first.</small></div>');
   pop.style.display = 'block';
-  pop.style.left = Math.min(r.left, innerWidth - 260) + 'px';
-  pop.style.top = Math.max(10, r.top - pop.offsetHeight - 8) + 'px';
+  pop.style.left = Math.max(10, Math.min(r.left + r.width / 2 - 130, innerWidth - 280)) + 'px';
+  const above = r.top - pop.offsetHeight - 8;  // open upwards, unless there's no room
+  pop.style.top = (above > 10 ? above : r.bottom + 8) + 'px';
   $$('.item[data-rec]', pop).forEach((el) => el.addEventListener('click', () => addRecording(el.dataset.rec)));
 }
 

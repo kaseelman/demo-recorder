@@ -4,7 +4,20 @@ import { flush } from '../../services/autosave.js';
 import { S } from '../../state/store.js';
 import { $, toast } from '../../utils/dom.js';
 
-let lastKind = null;
+let lastKind = null, wasRunning = false;
+
+/** A little confetti pop from an element: the render is done! */
+function burst(el) {
+  const r = el.getBoundingClientRect(), colors = ['#9d8cff', '#ff7ac6', '#5ee6d0', '#ffd54a', '#ffffff'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('span'), a = (i / 18) * Math.PI * 2, d = 40 + Math.random() * 50;
+    p.className = 'burst';
+    Object.assign(p.style, { left: r.left + r.width / 2 + 'px', top: r.top + r.height / 2 + 'px', position: 'fixed',
+      background: colors[i % colors.length], '--dx': Math.cos(a) * d + 'px', '--dy': Math.sin(a) * d + 'px' });
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
 
 export function bindRenderButtons() {
   $('#previewBtn').onclick = () => start(true);
@@ -34,5 +47,7 @@ export async function poll() {
   if (running) msg.textContent = `Rendering ${j.kind}… ${Math.round(j.progress * 100)}%`;
   else if (j.error) { msg.textContent = 'Render failed (details in the terminal)'; console.error(j.error); }
   else msg.textContent = `✓ ${j.kind}.mp4 ready`;
+  if (wasRunning && done) burst($('#openBtn'));
+  wasRunning = running;
   if (running) setTimeout(poll, 400);
 }

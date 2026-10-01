@@ -8,6 +8,12 @@ import { api } from './api.js';
 
 let timer = null, inflight = null, cursorDirty = false;
 
+function setSaveState(state, label) {
+  const el = $('#saveState');
+  el.dataset.state = state;
+  el.textContent = label;
+}
+
 /**
  * @param {object} o
  * @param {boolean} [o.redraw=true]   redraw the timeline
@@ -24,7 +30,7 @@ export function changed({ redraw = true, relayout = false, cursor = false } = {}
     actions.drawTimeline();
     actions.update();
   }
-  $('#saveState').textContent = 'Unsaved…';
+  setSaveState('dirty', 'Unsaved…');
   clearTimeout(timer);
   timer = setTimeout(save, 400);
 }
@@ -35,15 +41,15 @@ export async function save() {
   const project = JSON.parse(JSON.stringify(S.project, (k, v) => (k === '_id' ? undefined : v)));
   const body = { project, cursor_changed: cursorDirty };
   cursorDirty = false;
-  $('#saveState').textContent = 'Saving…';
+  setSaveState('saving', 'Saving…');
   inflight = api('/api/save', body)
     .then((r) => {
       for (const id in r.paths) if (S.info[id]) S.info[id].path = r.paths[id];
       for (const id in r.cursors) if (S.info[id]) S.info[id].cursor = r.cursors[id];
       actions.update();
-      $('#saveState').textContent = 'Saved';
+      setSaveState('saved', 'Saved');
     })
-    .catch((e) => { $('#saveState').textContent = 'Save failed'; toast(e.message); });
+    .catch((e) => { setSaveState('error', 'Save failed'); toast(e.message); });
   await inflight;
 }
 
