@@ -1,0 +1,9 @@
+#!/bin/zsh
+# Record the screen + mouse. Stop with ⌃⌥⌘S (or Ctrl-C in this terminal).
+set -e
+cd "${0:A:h}"
+BIN=recorder/.build/release/recorder
+if [[ ! -x $BIN || recorder/Sources/recorder/main.swift -nt $BIN ]]; then
+  echo "Building recorder…"; (cd recorder && swift build -c release -q)
+fi
+exec $BIN "$@"

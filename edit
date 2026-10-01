@@ -1,0 +1,4 @@
+#!/bin/zsh
+# Open the editor:  ./edit [recording-or-project-folder]   (default: your most recent project)
+ROOT="${0:A:h}"
+PYTHONPATH="$ROOT" exec "$ROOT/.venv/bin/python" -m demorec.cli edit "$@"

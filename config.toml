@@ -1,0 +1,57 @@
+# demo-recorder settings. Every value is optional; anything missing falls back to the
+# defaults in demorec/config.py. Editor projects store their own look (background, frame,
+# cursor, motion blur) in project.json; the sections marked "standalone" below only apply
+# when you render a recording directly with ./render <recording>.
+
+[output]
+width = 1920                  # output width in px (standalone renders)
+fps = 60
+encoder = "h264_videotoolbox" # fast hardware encoder; "libx264" gives smaller files at the same quality
+bitrate = "24M"               # used by videotoolbox encoders
+crf = 18                      # used by libx264
+
+[zoom]                        # automatic zooms, planned from your clicks
+max_zoom = 1.5                # never zoom in further than this (1.0 = the whole canvas)
+min_zoom = 1.12               # if a focus area would zoom less than this, don't bother zooming
+padding = 260                 # breathing room around the clicked area (recording pixels)
+lead_in = 0.6                 # start moving this many seconds *before* the first click
+hold = 1.4                    # stay zoomed this long after the last click
+merge_gap = 2.5               # clicks within this many seconds share one zoom (if they fit on screen)
+bridge_gap = 1.2              # if the next zoom starts within this, pan across instead of zooming out and in
+
+[camera]
+zoom_time = 1.1               # seconds a zoom in/out takes. Moves ease in and out and stop exactly on target
+pan_time = 1.0                # seconds a pan takes
+follow_margin = 0.15          # with "follow cursor": re-centre once the cursor is this close (fraction of view) to an edge
+follow_smoothing = 0.3        # how much small hand movements are ignored when following (seconds)
+follow_delay = 0.5            # wait this long after the first click before following
+lookahead = 0.15              # seconds; the camera reacts to where the cursor is about to be
+
+[cursor]                      # defaults for new projects + standalone renders
+style = "arrow"               # arrow | arrow-white | dot | highlight | none
+size = 1.5                    # relative to the normal macOS cursor
+smoothing = 0.1               # seconds; 0 = raw movement, 0.1 = smooth, 0.25 = silky glides
+click_scale = 0.82            # cursor squashes to this while the button is held
+ripple = true
+ripple_color = "#000000"
+ripple_opacity = 0.16
+
+[motion_blur]                 # standalone renders
+enabled = true
+amount = 0.35                 # 0 = off, 1 = classic 180° shutter. Low values keep it subtle
+max_samples = 8               # more = smoother blur, slower render
+
+[background]                  # standalone renders
+type = "none"                 # "none" (bare recording), "image", "linear", "radial" or "solid"
+image = "presets/big-sur.jpg" # any file under backgrounds/
+colors = ["#8b7bff", "#ff9ab5"]
+angle = 135                   # linear gradient angle, CSS-style (0 = to top, 90 = to right)
+color = "#eef0f5"             # solid colour
+
+[frame]                       # standalone renders
+padding = 0.07                # space around the recording, fraction of output width
+radius = 14                   # corner radius (px at 1920 wide)
+bezel = 10                    # glass rim thickness (px at 1920 wide), 0 = none
+glass = 0.35                  # how white/frosted the rim is
+shadow = 0.5                  # drop shadow strength
+stroke = true                 # subtle inner/outer edge lines

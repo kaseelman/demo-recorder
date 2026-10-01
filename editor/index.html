@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Demo Editor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/editor/styles.css">
+<script type="module" src="/editor/js/main.js"></script>
+</head>
+<body>
+<header>
+  <h1>Demo Editor</h1>
+  <select id="projSelect" title="Project"></select>
+  <input type="text" id="titleInput" placeholder="Project title" spellcheck="false">
+  <button id="newBtn" title="Start a new project from your latest recording">New project</button>
+  <span id="saveState"></span>
+  <div class="spacer"></div>
+  <div id="renderBox">
+    <div id="progress"><div></div></div>
+    <span id="renderMsg"></span>
+    <button id="openBtn" style="display:none">Open</button>
+    <button id="revealBtn" style="display:none">Show in Finder</button>
+    <button id="previewBtn">Render preview</button>
+    <button id="finalBtn" class="primary">Render final</button>
+  </div>
+</header>
+
+<main>
+  <div id="stageWrap">
+    <div id="stage"><div id="world"><div id="bgLayer"></div></div><div id="ghost"></div></div>
+    <div id="modeTag"></div>
+    <div id="empty">Add a recording with the ＋ in the timeline</div>
+    <div id="loading">Loading…</div>
+  </div>
+  <aside>
+    <div class="tabs seg" id="tabs">
+      <button data-tab="background" class="on">Background</button>
+      <button data-tab="frame">Frame</button>
+      <button data-tab="cursor">Cursor</button>
+      <button data-tab="output">Output</button>
+    </div>
+    <div id="panel"></div>
+  </aside>
+</main>
+
+<div id="controls">
+  <button id="playBtn" title="Play / pause (Space)">▶︎ Play</button>
+  <span id="time">0:00.0 / 0:00.0</span>
+  <div class="group"><button id="addBtn" title="Add a zoom at the playhead (Z)">＋ Zoom</button></div>
+  <div id="selBar"></div>
+  <div class="spacer"></div>
+  <label style="color:var(--muted);display:flex;align-items:center;gap:6px">Timeline <input id="tlZoom" type="range" min="1" max="12" step="0.1" value="1" style="width:110px"></label>
+</div>
+
+<div id="timeline"><div id="tlScroll"><div id="tlInner">
+  <div id="ruler"></div>
+  <div class="lane" id="vidLane"></div>
+  <div class="lane" id="zoomLane"></div>
+  <div class="lane" id="clickLane"></div>
+  <div id="playhead"></div>
+</div></div></div>
+
+<footer>
+  <span><kbd>Space</kbd> play</span><span><kbd>Z</kbd> add zoom</span><span><kbd>⌫</kbd> delete selected</span>
+  <span><kbd>Esc</kbd> deselect</span><span><kbd>←</kbd><kbd>→</kbd> step (⇧ = 1s)</span>
+  <span>Select a zoom to aim it: drag the frame, drag a corner or scroll to zoom</span>
+  <span>Drag clip edges to trim · click a transition badge to change it</span>
+  <span><span style="color:var(--click)">●</span> = your clicks</span>
+</footer>
+<div id="popover"></div>
+<div id="toast"></div>
+<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" style="display:none">
+</body>
+</html>
